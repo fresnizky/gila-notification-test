@@ -50,4 +50,8 @@ app.post("/api/notification", (req, res) => {
   });
 });
 
+app.get("/api/log", (req, res) => {
+  res.sendFile(path.join(__dirname, "notifications.log"));
+});
+
 app.listen(8000, () => console.log("Server running on port 8000"));
