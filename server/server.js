@@ -1,5 +1,16 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
+
+const logStream = fs.createWriteStream(
+  path.join(__dirname, "notifications.log"),
+  { flags: "a" }
+);
+
+console.log = function (message) {
+  logStream.write(message + "\n");
+};
 
 const app = express();
 app.use(cors());
@@ -24,19 +35,15 @@ app.post("/api/notification", (req, res) => {
     if (user.subscribed.includes(category)) {
       user.channels.forEach((channel) => {
         console.log(
-          `[${requestDate.toUTCString()}] Sending ${channel} notification to ${
-            user.name
-          }(${
-            channel === "Email" ? user.email : user.phoneNumber
-          }) about ${category} with message: ${message}`
+          JSON.stringify({
+            userID: user.ID,
+            category: category,
+            message: message,
+            channel: channel,
+            timestamp: requestDate,
+          })
         );
       });
-    } else {
-      console.log(
-        `[${requestDate.toUTCString()}] ${
-          user.name
-        } is not subscribed to ${category}`
-      );
     }
 
     res.sendStatus(200);
